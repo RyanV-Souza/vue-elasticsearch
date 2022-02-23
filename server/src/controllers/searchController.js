@@ -2,8 +2,6 @@ const client = require('../routes/config/elastic')
 
 exports.get = (req, res, next) => {
 	const text = req.query.text
-	console.log(req.query.text)
-
 	client.search({
 		body: {
 			query: {
@@ -16,9 +14,16 @@ exports.get = (req, res, next) => {
 		}
 	})
 	.then(response => {
-		return res.json(response.body.hits.hits)
+		let results = []
+		const hits = response.body.hits.hits
+		hits.map(item => {
+			results.push(item._source)
+		})
+
+		return res.send(results)
 	})
 	.catch(err => {
+		console.log(err)
 		return res.status(500).json({"message": err})
 	})
 }
